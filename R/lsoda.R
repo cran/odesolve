@@ -47,10 +47,6 @@ lsoda <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
     ## change the value of funcname to either symbol.C or symbol.For, depending
     ## on which way we find the symbol
     if (is.character(func)) {
-      if (as.numeric(R.version$major) < 1 ||
-          (as.numeric(R.version$major) == 1 &&
-           as.numeric(R.version$minor) < 4.0))
-        stop("You must be using at least version 1.4.0 of R to use dynamically loaded ode definitions")
       
       funcname <- func
       if (is.loaded(symbol.C(funcname),PACKAGE=dllname)) {

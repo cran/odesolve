@@ -30,11 +30,7 @@ static void lsoda_derivs (long int *neq, double *t, double *y, double *ydot)
   incr_N_Protect();
   for (i = 0; i < *neq; i++)
     {
-#if R_VERSION >= R_Version(1, 2, 0)
 	ydot[i] = REAL(VECTOR_ELT(ans,0))[i];
-#else
-	ydot[i] = REAL(VECTOR(ans)[0])[i];
-#endif
     }
   my_unprotect(4);
 }
