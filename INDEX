@@ -1,6 +1,6 @@
-ccl4data.avg            Closed chamber study of CCl4 metabolism by
-                        rats.
 ccl4data                Closed chamber study of CCl4 metabolism by
+                        rats.
+ccl4data.avg            Closed chamber study of CCl4 metabolism by
                         rats.
 lsoda                   Solve System of ODE (ordinary differential
                         equation)s.

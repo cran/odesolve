@@ -101,7 +101,8 @@ lsoda <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
                    length(y),")",sep=""))
       Nglobal <- if (length(tmp) > 1) length(tmp[[2]]) else 0
     }
-    out <- .Call("call_lsoda",as.double(y),as.double(times),func,parms,
+    storage.mode(y) <- storage.mode(times) <- "double"
+    out <- .Call("call_lsoda",y,times,func,parms,
                  rtol, atol, rho, tcrit, jacfunc, ModelInit,
                  as.integer(verbose), hmin, hmax, PACKAGE="odesolve")
     istate <- attr(out,"istate")
@@ -109,8 +110,11 @@ lsoda <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
             if (!is.null(attr(y,"names"))) names(y) else as.character(1:n))
     if (Nglobal > 0) {
         out2 <- matrix( nrow=Nglobal, ncol=ncol(out))
-        for (i in 1:ncol(out2))
-            out2[,i] <- func(out[1,i],out[-1,i],parms)[[2]]
+        for (i in 1:ncol(out2)) {
+          y <- out[-1,i]
+          names(y) <- nm[-1]
+          out2[,i] <- func(out[1,i],y,parms)[[2]]
+          }
         out <- rbind(out,out2)
         nm <- c(nm,
                 if (!is.null(attr(tmp[[2]],"names"))) names(tmp[[2]])

@@ -1,41 +1,7 @@
-Version 0.5-7
+Version 0.5-11
 
     Bug Fixes
 
-    1.  Fix long warnings from Fortran
-
-    New Features
-
-    1.  add DDASSL as a solver
-    2.  add a RK solver
-
-
-Version 0.5-8
-
-    Bug Fixes
-    
-    New Features
-    
-    1.  Model Language Translator (Modeltrans?)
-    Features:
-    
-	a. statement sorting 
-	b. parameters, state variables can be
-	arrays 
-	c. for loops with determinate limits
-	d. if then else construction: restarts solver if state or
-	parameter value is changed.
-	d. output to either R or C source, as a package
-
-Version 0.5-9
-
-	Bug Fixes
-
-	New Features
-
-	1.  solvers lsodar and ddasslrt (that is, the root-finding
-	    versions of LSODA and DDASSL
-	2.  incorporate new solvers into Modeltrans
-	3.  events for Modeltrans
+    1.  pass names attribute for state vector to R odefunction
 
 

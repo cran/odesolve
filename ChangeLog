@@ -1,3 +1,96 @@
+2004-10-12  R. Woodrow Setzer  <setzer@node24.cluster2.org>
+
+	* src/dgbfa.f, src/dgbsl.f, src/dgefa.f, src/dgesl.f:
+	deleted by mistake
+	: ---------------------------------------------------------------------
+
+	* src/lsoda.f: corrected typo
+
+	* src/intdy.f: removed use of xerrwv in favor of rwarn
+
+	* src/dgbfa.f, src/dgbsl.f, src/dgefa.f, src/dgesl.f:
+	use R's internal code for these
+
+	* src/xerrwv.f: no longer needed: use rwarn directly.
+
+	* src/xerrwv.f: deleted unnecessary code
+
+	* src/xsetf.f: removed: no longer needed.
+
+	* src/lsoda.f:
+	replaced all references to xerrwv with references to rwarn
+
+2004-10-01  R. Woodrow Setzer  <setzer@node24.cluster2.org>
+
+	* src/call_lsoda.c, src/i1mach.f, src/odesolve.h, src/odesolve_utils.c, src/xerrwv.f:
+	Allow names attribute on state var to be passed, and use R's rwarn and rexit
+
+2004-06-16  R. Woodrow Setzer  <setzer@node24.cluster2.org>
+
+	* man/lsoda.Rd: fixed typo in l-v example
+
+	* man/lsoda.Rd: added comment to l-v example.
+
+	* man/lsoda.Rd:
+	modified l-v example to use a closure to pass the parameters
+
+	* ChangeLog: updated Change Log
+
+	* man/lsoda.Rd:
+	modified the l-v example to use the names attribute of the state variable,
+	and explicitly mentioned the availability of the names attribute in func()
+	when it is an R function.
+
+2004-06-16  R. Woodrow Setzer  <setzer@localhost.localdomain>
+
+	* man/lsoda.Rd:
+	modified the l-v example to use the names attribute of 
+	the state variable, and explicitly mentioned the availability 
+	of the names attribute in func() when it is an R function.
+
+2004-06-15  R. Woodrow Setzer  <setzer@localhost.localdomain>
+
+	* R/lsoda.R: passing through names attribute
+
+	* src/call_lsoda.c: passing through the names attribute
+
+	* src/call_lsoda.c: fixed typo.
+
+	* src/call_lsoda.c: passing along names attribute
+
+	* src/call_lsoda.c:
+	passing through the names attribute for the state vector.
+
+	* src/odesolve_utils.c:
+	Part of fix to pass along the names attribute for the state vector to R
+	functions.
+
+	* src/odesolve.h:
+	Part of code fix to preserve names attribute on state vector
+
+	* R/lsoda.R:
+	changed as.double(y) to storage.mode(y) <- "double" to preserve names
+	attributes.
+
+	* ToDo:
+	Update TODO list, deleting outdated (and largely unfollowed) wish list.
+
+	* DESCRIPTION: update for next version
+
+2004-04-05  R. Woodrow Setzer  <setzer@localhost.localdomain>
+
+	* ChangeLog: update
+
+	* R/lsoda.R: added PACKAGE argument to .Call()
+
+	* src/call_lsoda.c: fixing typos
+
+	* ChangeLog: update for version 0-5-10
+
+	* src/call_lsoda.c: Fixed function pointer for initializer
+
+	* DESCRIPTION: Updated date and version number
+
 2004-04-05  R. Woodrow Setzer  <setzer@localhost.localdomain>
 
 	* R/lsoda.R: added PACKAGE argument to .Call()

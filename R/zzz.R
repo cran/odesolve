@@ -1,4 +1,4 @@
 .First.lib <- function(libname,pkgname)
   {
-    library.dynam("odesolve","odesolve")
+    library.dynam("odesolve","odesolve",lib.loc=libname)
   }

@@ -884,5 +884,5 @@ C
 C
 C     CALL FDUMP
 C
-      CALL Rstop('I1MACH FAILED')
+      CALL rexit('I1MACH FAILED')
       END

@@ -33,7 +33,9 @@ verbose=FALSE, dllname=NULL, hmin=0, hmax=Inf)
     If \code{func}  is a user-supplied function, it must be called as:
     \code{yprime = func(t, y, parms)}.  \code{t} is the current time point
     in the integration, \code{y} is the current estimate of the variables
-    in the ode system, and \code{parms} is a vector of parameters (which
+    in the ode system.  If the initial values \code{y} has a names
+    attribute, the names will be available inside func.  \code{parms} is
+    a vector of parameters (which
     may have a names attribute, desirable in a large system).
 
     The return value of func should be a list, whose first element is a
@@ -331,20 +333,19 @@ all.equal(out, outJ) # TRUE
 
 ## Example for using hmax
 
+## Parameters for steady state conditions
+parms  <- c(a=0.0, b=0.0, c=0.1, d=0.1, e=0.1, f=0.1, g=0.0)
+
 ## A simple resource limited Lotka-Volterra-Model
-lvmodel <- function(t, x, parms) {
-  s <- x[1] # substrate
-  p <- x[2] # producer
-  k <- x[3] # consumer
-  with(as.list(parms),{
-    import <- approx(signal$times, signal$import, t)$y
-    ds <- import - b*s*p + g*k
-    dp <- c*s*p  - d*k*p
-    dk <- e*p*k  - f*k
+## Note passing parameters through using a closure
+lvmodel <- with(as.list(parms), function(t, x, parms) {
+    import <- sigimp(t)
+    ds <- import - b*x["s"]*x["p"] + g*x["k"]
+    dp <- c*x["s"]*x["p"]  - d*x["k"]*x["p"]
+    dk <- e*x["p"]*x["k"]  - f*x["k"]
     res<-c(ds, dp, dk)
     list(res)
   })
-}
 
 ## vector of timesteps
 times  <- seq(0, 100, length=101)
@@ -355,8 +356,8 @@ signal <- as.data.frame(list(times = times,
 
 signal$import[signal$times >= 10 & signal$times <=11] <- 0.2
 
-## Parameters for steady state conditions
-parms  <- c(a=0.0, b=0.0, c=0.1, d=0.1, e=0.1, f=0.1, g=0.0)
+sigimp <- approxfun(signal$times, signal$import, rule=2)
+
 
 ## Start values for steady state
 y<-xstart <- c(s=1, p=1, k=1)

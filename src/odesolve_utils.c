@@ -21,20 +21,13 @@ void my_unprotect(int n)
     N_Protected -= n;
 }
 
- /* Rstop, which calls error, as a replacement
- * for fortran STOP (call Rstop(message)
- * and rwarn to send an R warning() (added by Jim Lindsay)
- */
-
-void F77_SUB(rstop)(char *message) { error("%s",message); }
-
-void F77_SUB(rwarn)(char *message) { warning("%s",message); }
 
 /* Globals :*/ 
 SEXP odesolve_deriv_func;
 SEXP odesolve_jac_func;
 SEXP odesolve_envir;
 SEXP odesolve_gparms;
+SEXP odesolve_Y_names;
 
 void Initodeparms(long int *N, double *parms)
 {

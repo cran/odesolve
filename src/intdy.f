@@ -34,6 +34,7 @@ c where  c(j,k) = j*(j-1)*...*(j-k+1), q = nqcur, tn = tcur, h = hcur.
 c the quantities  nq = nqcur, l = nq+1, n = neq, tn, and h are
 c communicated by common.  the above sum is done in reverse order.
 c iflag is returned negative if either k or t is out of bounds.
+c Modified to use rwarn() instead of xerrwv() 10/12/2004 RWS
 c-----------------------------------------------------------------------
       iflag = 0
       if (k .lt. 0 .or. k .gt. nq) go to 80
@@ -69,15 +70,12 @@ c
  60     dky(i) = r*dky(i)
       return
 c
- 80   call xerrwv(30hintdy--  k (=i1) illegal      ,
-     1   30, 51, 0, 1, k, 0, 0, 0.0d0, 0.0d0)
+ 80   call rwarn('intdy--  k (=i1) illegal ')
       iflag = -1
       return
- 90   call xerrwv(30hintdy--  t (=r1) illegal      ,
-     1   30, 52, 0, 0, 0, 0, 1, t, 0.0d0)
-      call xerrwv(
-     1  60h      t not in interval tcur - hu (= r1) to tcur (=r2)      ,
-     1   60, 52, 0, 0, 0, 0, 2, tp, tn)
+ 90   call rwarn('intdy--  t (=r1) illegal ')
+      call rwarn(
+     1  't not in interval tcur - hu (= r1) to tcur (=r2)')
       iflag = -2
       return
 c----------------------- end of subroutine intdy -----------------------

@@ -19,7 +19,8 @@ static void lsoda_derivs (long int *neq, double *t, double *y, double *ydot)
 
   PROTECT(Time = NEW_NUMERIC(1));incr_N_Protect();
   REAL(Time)[0] = *t;
-  PROTECT(Y = NEW_NUMERIC(*neq));incr_N_Protect();
+  PROTECT(Y = allocVector(REALSXP,(*neq)));incr_N_Protect();
+  setAttrib(Y, R_NamesSymbol, odesolve_Y_names);
   for (i = 0; i < *neq; i++)
     {
       REAL(Y)[i] = y[i];
@@ -43,7 +44,8 @@ static void lsoda_jac (long int *neq, double *t, double *y, long int *ml,
 
   PROTECT(Time = NEW_NUMERIC(1));incr_N_Protect();
   REAL(Time)[0] = *t;
-  PROTECT(Y = NEW_NUMERIC(*neq));incr_N_Protect();
+  PROTECT(Y = allocVector(REALSXP,(*neq)));incr_N_Protect();
+  setAttrib(Y, R_NamesSymbol, odesolve_Y_names);
   for (i = 0; i < *neq; i++)
     {
       REAL(Y)[i] = y[i];
@@ -88,13 +90,15 @@ SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
   ny = LENGTH(y);
   neq = ny;
   mflag = INTEGER(verbose)[0];
-  F77_CALL(xsetf)(&mflag);
+  /*  F77_CALL(xsetf)(&mflag); We don't use this anymore */
   xytmp = (double *) R_alloc(neq, sizeof(double));
   for (j = 0; j < ny; j++) xytmp[j] = REAL(y)[j];
   nt = LENGTH(times);
   nprot = 0;
   PROTECT(yout = allocMatrix(REALSXP,ny+1,nt));incr_N_Protect();
   PROTECT(odesolve_gparms = parms); incr_N_Protect();
+  PROTECT(odesolve_Y_names = getAttrib(y, R_NamesSymbol)); incr_N_Protect();
+
   if (inherits(func, "NativeSymbol")) 
     {
       derivs = (deriv_func *) R_ExternalPtrAddr(func);
