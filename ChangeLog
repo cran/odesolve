@@ -1,3 +1,7 @@
+2001-05-09    <setzer@ERCUS03252140>
+
+	* man/lsoda.Rd:  conditionalized the regression example using gnlm
+
 2001-05-03    Woodrow Setzer <setzer.woodrow@epa.gov>
 
 	* R/lsoda.R: forced y and times to be double; added defaults for atol and rtol 
