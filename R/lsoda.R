@@ -20,7 +20,7 @@
 ###          the initializer for the problem.
 
 lsoda <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
-	tcrit = NULL, jacfunc=NULL, verbose=FALSE, dllname=NULL)
+	tcrit = NULL, jacfunc=NULL, verbose=FALSE, dllname=NULL, hmin=0, hmax=Inf)
 {
     if (!is.numeric(y)) stop("`y' must be numeric")
     n <- length(y)
@@ -39,6 +39,13 @@ lsoda <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
         stop("`atol' must either be a scaler, or as long as `y'")
     if (length(rtol) > 1 && length(rtol) != n)
         stop("`rtol' must either be a scaler, or as long as `y'")
+    ## patch by thpe
+    if (!is.numeric(hmin)) stop("`hmin' must be numeric")
+    if (hmin < 0) stop ("`hmin' must be a non-negative value")
+    if (!is.numeric(hmax)) stop("`hmax' must be numeric")
+    if (hmax < 0) stop ("`hmax' must be a non-negative value")
+    if (hmax == Inf) hmax <- 0 # in lsoda.f 0 is internally handled as Inf    
+    ## end patch
     
     ## If func is a character vector, then
     ## copy its value to funcname 
@@ -97,7 +104,7 @@ lsoda <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
       Nglobal <- if (length(tmp) > 1) length(tmp[[2]]) else 0
     }
     out <- .Call("call_lsoda",as.double(y),as.double(times),func,parms,
-                 rtol, atol, rho, tcrit, jacfunc, ModelInit, as.integer(verbose))
+                 rtol, atol, rho, tcrit, jacfunc, ModelInit, as.integer(verbose), hmin, hmax)
     istate <- attr(out,"istate")
     nm <- c("time",
             if (!is.null(attr(y,"names"))) names(y) else as.character(1:n))

@@ -63,7 +63,7 @@ static void lsoda_jac (long int *neq, double *t, double *y, long int *ml,
 
 SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
 		SEXP atol, SEXP rho, SEXP tcrit, SEXP jacfunc, SEXP initfunc,
-		SEXP verbose)
+		SEXP verbose, SEXP hmin, SEXP hmax)
 {
   SEXP yout, yout2, ISTATE;
   int i, j, k, ny, nt, repcount, latol, lrtol, nprot;
@@ -130,6 +130,17 @@ SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
   if (itask == 4) rwork[0] = REAL(tcrit)[0];
   liw = 20 + neq;
   iwork = (long int *) R_alloc(liw, sizeof(long int));
+
+  // start patch of thpe
+  for (i=4; i<10; i++) {
+    rwork[i]=0.0;
+    iwork[i]=0;
+  }
+  rwork[5] = REAL(hmax)[0];
+  rwork[6] = REAL(hmin)[0];
+  if (rwork[5] >0 || rwork[6] >0) iopt = 1;
+  // end patch of thpe
+
   if (!isNull(jacfunc))
     {
       if (inherits(jacfunc,"NativeSymbol"))

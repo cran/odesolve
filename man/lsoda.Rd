@@ -17,7 +17,7 @@
 }
 \usage{
 lsoda(y, times, func, parms, rtol, atol, tcrit=NULL, jacfunc=NULL,
-verbose=FALSE, dllname=NULL)
+verbose=FALSE, dllname=NULL, hmin=0, hmax=Inf)
 }
 \arguments{
   \item{y}{the initial values for the ode system.  If \code{y} has a
@@ -78,7 +78,14 @@ verbose=FALSE, dllname=NULL)
   \item{dllname}{a string giving the name of the shared library (without
     extension) that contains all the compiled function or subroutine
     definitions refered to in \code{func} and \code{jac}.}
-}
+  \item{hmin}{an optional minimum value of the integration
+    stepsize. In special situations this parameter may speed up computations with
+    the cost of precision. Don't use \code{hmin} if you don't know why!}
+  \item{hmax}{an optional maximum value of the integration
+    stepsize. A maximum value may be necessary for non-autonomous models (with external
+    inputs), otherwise the simulation possibly ignores short external
+    events.}
+  }
 \details{
   All the hard work is done by the Fortran subroutine \code{lsoda},
   whose documentation should be consulted for details (it is included as

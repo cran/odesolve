@@ -1,6 +1,6 @@
 Package: odesolve
-Version: 0.5-7
-Date: 2002/05/21
+Version: 0.5-7.1
+Date: 2002/12/09
 Title: Solvers for Ordinary Differential Equations
 Author: R. Woodrow Setzer <setzer.woodrow@epa.gov>
 Maintainer: R. Woodrow Setzer <setzer.woodrow@epa.gov>

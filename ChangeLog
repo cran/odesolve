@@ -1,3 +1,15 @@
+2002-12-09  Thomas Petzoldt <petzoldt@rcs.urz.tu-dresden.de>
+
+	* lsoda.Rd: new simulation parameters hmin and hmax
+
+	* call_lsoda.c: hmin, hmax
+
+	* lsoda.R: hmin, hmax
+
+	* rk4.R: experimental RK4 integrator
+
+	* rk4.Rd: most of the text is taken from lsoda.Rd
+	
 2002-04-03  Woodrow Setzer  <setzer.woodrow@epa.gov>
 
 	* lsoda.Rd: fixed another link (nls)
