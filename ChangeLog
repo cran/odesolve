@@ -1,3 +1,13 @@
+2001-05-03    Woodrow Setzer <setzer.woodrow@epa.gov>
+
+	* R/lsoda.R: forced y and times to be double; added defaults for atol and rtol 
+	  (per Jim Lindsay)
+	* src/call_lsoda.c: Write warnings from lsoda.f as warnings through R
+	* src/R-stop.c:     instead of to lsoda.log
+	* src/xerrwv.f:     (per Jim Lindsay)
+	* man/lsoda.Rd:     Added regression example
+	* Description (Version): 0.5-4
+
 2001-02-02  Woodrow Setzer  <setzer.woodrow@epa.gov>
 
 	* Description: added Martin to authors, changed date

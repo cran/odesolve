@@ -10,7 +10,8 @@
 ###          The return value is a matrix whose rows correspond to the values
 ###          in `times', and columns to the elements of `y'.
 
-lsoda <- function(y, times, func, parms, rtol, atol, tcrit = NULL,jacfunc=NULL)
+lsoda <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
+	tcrit = NULL, jacfunc=NULL)
 {
     if (!is.numeric(y)) stop("`y' must be numeric")
     n <- length(y)
@@ -32,7 +33,7 @@ lsoda <- function(y, times, func, parms, rtol, atol, tcrit = NULL,jacfunc=NULL)
     ## results it wants to return
     tmp <- eval(func(times[1],y,parms),rho)
     Nglobal <- if (length(tmp) > 1) length(tmp[[2]]) else 0
-    out <- .Call("call_lsoda",y,times,func,parms,
+    out <- .Call("call_lsoda",as.double(y),as.double(times),func,parms,
                  rtol, atol, rho, tcrit,
                  jacfunc)
     istate <- attr(out,"istate")

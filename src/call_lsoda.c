@@ -71,16 +71,9 @@ SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
     mflag, lstamp, lfnm, lunit;
   void (*jac)(long int *, double *, double *, long int *,
 	      long int *, double *, long int *);
-  char *timestamp, *fnm="lsoda.log";
   time_t result;
 
   init_N_Protect();
-  lunit = 10;
-  lfnm = strlen(fnm);
-  time(&result);
-  timestamp = asctime(localtime(&result));
-  lstamp = strlen(timestamp);
-  F77_CALL(openlog)(&lunit, fnm, &lfnm, timestamp, &lstamp);
 
   ny = LENGTH(y);
   neq = ny;
@@ -157,9 +150,8 @@ SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
 	} while (tin < tout && istate >= -2 && repcount < 20);
       if (istate == -3)
 	{
-	  F77_CALL(closelog)(&lunit);
 	  unprotect_all();
-	  error("Illegal input to lsoda.  `lsoda.log' might have more information.\n");
+	  error("Illegal input to lsoda\n");
 	}
       else
 	{
@@ -188,7 +180,6 @@ SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
     {
       setAttrib(yout2, install("istate"), ISTATE);
     }
-  F77_CALL(closelog)(&lunit);
       
   unprotect_all();
   if (istate > 0)

@@ -9,6 +9,9 @@ c a simplified version of the slatec error handling package.
 c written by a. c. hindmarsh at llnl.  version of march 30, 1987.
 c this version is in double precision.
 c
+c Modified 05/03/2001 by Woodrow Setzer (after Jim Lindsay's suggestions)
+c for use with lsoda in R package odesolve.
+c
 c all arguments are input arguments.
 c
 c msg    = the message (hollerith literal or integer array).
@@ -75,13 +78,13 @@ c     data ncpw/2/
 c-----------------------------------------------------------------------
       if (mesflg .eq. 0) go to 100
 c get logical unit number. ---------------------------------------------
-      lun = lunit
+c      lun = lunit
 c get number of words in message. --------------------------------------
       nch = min0(nmes,60)
       nwds = nch/ncpw
       if (nch .ne. nwds*ncpw) nwds = nwds + 1
 c write the message. ---------------------------------------------------
-      write (lun, 10) (msg(i),i=1,nwds)
+c      write (lun, 10) (msg(i),i=1,nwds)
 c-----------------------------------------------------------------------
 c the following format statement is to have the form
 c 10  format(1x,mmann)
@@ -95,21 +98,24 @@ c 10  format(1x,10a6)
 c the following is valid for ncpw = 5.
 c 10  format(1x,12a5)
 c the following is valid for ncpw = 4.
-  10  format(1x,15a4)
+c  10  format(1x,15a4)
 c the following is valid for ncpw = 2.
 c 10  format(1x,30a2)
 c-----------------------------------------------------------------------
-      if (ni .eq. 1) write (lun, 20) i1
- 20   format(6x,23hin above message,  i1 =,i10)
-      if (ni .eq. 2) write (lun, 30) i1,i2
- 30   format(6x,23hin above message,  i1 =,i10,3x,4hi2 =,i10)
-      if (nr .eq. 1) write (lun, 40) r1
- 40   format(6x,23hin above message,  r1 =,d21.13)
-      if (nr .eq. 2) write (lun, 50) r1,r2
- 50   format(6x,15hin above,  r1 =,d21.13,3x,4hr2 =,d21.13)
+c      if (ni .eq. 1) write (lun, 20) i1
+c 20   format(6x,23hin above message,  i1 =,i10)
+c      if (ni .eq. 2) write (lun, 30) i1,i2
+c 30   format(6x,23hin above message,  i1 =,i10,3x,4hi2 =,i10)
+c      if (nr .eq. 1) write (lun, 40) r1
+c 40   format(6x,23hin above message,  r1 =,d21.13)
+c      if (nr .eq. 2) write (lun, 50) r1,r2
+c 50   format(6x,15hin above,  r1 =,d21.13,3x,4hr2 =,d21.13)
 c abort the run if level = 2. ------------------------------------------
- 100  if (level .ne. 2) return
-      call Rstop('stop')
+ 100  if (level .ne. 2) then
+         call Rwarn(msg)
+         return
+      endif
+      call Rstop(msg)
 c----------------------- end of subroutine xerrwv ----------------------
       end
 c----------------------- block data to initialize eh0001 ---------------
