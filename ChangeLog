@@ -1,0 +1,29 @@
+2001-02-02  Woodrow Setzer  <setzer.woodrow@epa.gov>
+
+	* Description: added Martin to authors, changed date
+	* man/lsoda.Rd: added Martin to authors
+
+2001-02-02  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* man/lsoda.Rd: cleaned up, added \link{}; all.equal() in example
+
+2001-02-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+	
+	* src/call_lsoda.c: Moved the "exports" to
+	* src/odesolve.h 
+
+	* src/prja.f (prja):   Fixed the dimension declarations
+	* src/rchek.f (rchek): such that "g77 -fpedantic" doesn't complain
+	* src/solsy.f (solsy): anymore
+	* src/stoda.f (stoda): 
+
+2001-01-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.5-3
+	* ChangeLog {use this file!}
+	
+2000-11-21  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/odesolve.h: declare things ( -> no warnings in "picky mode")
+	* src/call_lsoda.c : use odesolve.h and `R 1.2' compatible headers
+	* src/R-stop.c     : +- the same
