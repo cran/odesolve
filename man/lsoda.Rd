@@ -7,23 +7,30 @@
   Fortran ODE solver of the same name, written by Linda R. Petzold and Alan
   C. Hindmarsh.  The system of ODE's is written as an \R function (which
   may, of course, use \code{\link{.C}}, \code{.Fortran},
-  \code{\link{.Call}}, etc., to call foreign code).  A vector of
+  \code{\link{.Call}}, etc., to call foreign code) or be defined in
+  compiled code that has been dynamically loaded.  A vector of
   parameters is passed to the ODEs, so the solver may be used as part of
   a modeling package for ODEs, or for parameter estimation using any
   appropriate modeling tool for non-linear models in \R such as
-  \code{\link{optim}}, \code{\link{nls}}, \code{\link{nlm}} or
+  \code{\link{optim}}, \code{\link[nls]{nls}}, \code{\link{nlm}} or
   \code{\link[nlme]{nlme}}.
 }
 \usage{
-lsoda(y, times, func, parms, rtol, atol, tcrit=NULL,jac=NULL)
+lsoda(y, times, func, parms, rtol, atol, tcrit=NULL, jacfunc=NULL,
+verbose=FALSE, dllname=NULL)
 }
 \arguments{
   \item{y}{the initial values for the ode system.  If \code{y} has a
     name attribute, the names will be used to label the output matrix.}
   \item{times}{times at which explicit estimates for \code{y} are
     desired.  The first value in \code{times} must be the initial time.}
-  \item{func}{a user-supplied function that computes the values of the
-    derivatives in the ode system at time t.  It must be called as:
+  \item{func}{either a user-supplied function that computes the values of the
+    derivatives in the ode system (the \emph{model defininition}) at time
+    t, or a character string
+    giving the name of a compiled function in a dynamically loaded
+    shared library.
+
+    If \code{func}  is a user-supplied function, it must be called as:
     \code{yprime = func(t, y, parms)}.  \code{t} is the current time point
     in the integration, \code{y} is the current estimate of the variables
     in the ode system, and \code{parms} is a vector of parameters (which
@@ -34,12 +41,16 @@ lsoda(y, times, func, parms, rtol, atol, tcrit=NULL,jac=NULL)
     \code{time}, and whose second element is a vector (possibly with a
     \code{\link{names}} attribute) of global values that are required at
     each point in \code{times}.
+
+    If \code{func} is a string, then \code{dllname} must give the name
+    of the shared library (without extension) which must be loaded
+    before \code{lsoda()} is called.  see Details for more information.
   }
   \item{parms}{any parameters used in \code{func} that should be
     modifiable without rewriting the function.}
-  \item{rtol}{relative error tolerance, either a scaler or an array as
+  \item{rtol}{relative error tolerance, either a scalar or an array as
     long as \code{y}.  See details.}
-  \item{atol}{absolute error tolerance, either a scaler or an array as
+  \item{atol}{absolute error tolerance, either a scalar or an array as
     long as \code{y}.  See details.}
   \item{tcrit}{the Fortran routine \code{lsoda} overshoots its targets
     (times points in the vector \code{times}), and interpolates values
@@ -50,15 +61,23 @@ lsoda(y, times, func, parms, rtol, atol, tcrit=NULL,jac=NULL)
     \code{times} past \code{tcrit}, since the solver will stop and
     return at the last point in \code{times} that is earlier than
     \code{tcrit}.}
-  \item{jac}{an \R function (or \code{NULL}) that computes
-    the jacobian of the system of differential equations:
-    dydot(i)/dy(j).  In some circumstances, supplying \code{jac} can speed up
-    the computations, if the system is stiff.  The calling sequence for
+  \item{jacfunc}{if not \code{NULL}, an \R function that computes
+    the jacobian of the system of differential equations
+    dydot(i)/dy(j), or a string giving the name of a function or
+    subroutine in \file{dllname} that computes the jacobian (see Details
+    below for more about this option).  In some circumstances, supplying
+    \code{jac} can speed up
+    the computations, if the system is stiff.  The \R calling sequence for
     \code{jac} is identical to that of \code{func}.  \code{jac} should
     return a vector whose ((i-1)*length(y) + j)th value is
     dydot(i)/dy(j). That is, return the matrix dydot/dy, where the ith
     row is the derivative of \eqn{dy_i/dt} with respect to \eqn{y_j},
     by columns (the way \R and Fortran store matrices).}
+  \item{verbose}{a logical value that, when TRUE, should trigger more
+    verbose output from the ode solver.  Currently does not do anything.}
+  \item{dllname}{a string giving the name of the shared library (without
+    extension) that contains all the compiled function or subroutine
+    definitions refered to in \code{func} and \code{jac}.}
 }
 \details{
   All the hard work is done by the Fortran subroutine \code{lsoda},
@@ -76,8 +95,9 @@ lsoda(y, times, func, parms, rtol, atol, tcrit=NULL,jac=NULL)
   weights.  The values of \code{rtol} and \code{atol} should all be
   non-negative.
   The form of \bold{ewt} is:
-  \deqn{\mathbf{rtol} \times \mathrm{abs}(\mathbf{y}) + \mathbf{atol}}%
-       {\bold{rtol} * abs(\bold{y}) + \bold{atol}}, 
+  
+  \deqn{\mathbf{rtol} \times \mathrm{abs}(\mathbf{y}) + \mathbf{atol}}{\bold{rtol} * abs(\bold{y}) + \bold{atol}}
+  
   where multiplication of two vectors is element-by-element.
 
   If the request for precision exceeds the capabilities of the machine,
@@ -85,6 +105,131 @@ lsoda(y, times, func, parms, rtol, atol, tcrit=NULL,jac=NULL)
   circumstances, the \R function \code{lsoda} will attempt a reasonable
   reduction of precision in order to get an answer.  It will write a
   warning if it does so.
+
+  Models may be defined in compiled C or Fortran code, as well as in R. 
+  For C, the calling sequence for func must be as in the following
+  example:
+  
+  \code{void myderivs(long int *neq, double *t, double *y, double *ydot)}\cr
+  \code{\{}\cr
+    \code{ydot[0] = -k1*y[0] + k2*y[1]*y[2];}\cr
+    \code{ydot[2] = k3 * y[1]*y[1];}\cr
+    \code{ydot[1] = -ydot[0]-ydot[2];}\cr
+  \code{\}}\cr
+
+  where \code{*neq} is the number of equations, \code{*t} is the value
+  of the independent variable, \code{y} points to a double precision
+  array of length \code{*neq} that contains the current value of the
+  state variables, and \code{ydot} points to an array that will contain
+  the calculated derivatives.
+  
+  In this example, parameters are kept in a global variable in the C
+  code declared as
+
+  \code{static double parms[3];}
+
+  \code{#define} statements are used to make the code more readable, as
+  in \code{#define k1 parms[0]}
+  
+  This is the only way to pass parameters to a compiled C function
+  from the calling R code.  Functions that use this mechanism must be
+  accompanied by a function with the same name as the shared library
+  which has as its sole argument a pointer to a function (see
+  declaration below) that fills a double array with double precision
+  values, to copy the parameter
+  values into the global variable.  In the example here, the library
+  is named \file{mymod.so}, a function such as:
+  
+  \code{void mymod(void (* odeparms)(long int *, double *))}\cr
+  \code{\{}\cr
+    \code{long int N=3;}\cr
+    \code{odeparms(&N, parms);}\cr
+  \code{\}}\cr
+
+will be required to initialize the parameter vector.  Here
+  \code{mymod} just calls \code{odeparms} with a pointer to a long int
+  that contains the dimension of the parameter vector, and a pointer to
+  the array that will contain the parameter values.
+  
+  Models may also be defined in Fortran.  For example:
+  
+  \code{subroutine myderivs (neq, t, y, ydot)}\cr
+  \code{double precision t, y, ydot, parms(3)}\cr
+  \code{integer neq}\cr
+  \code{dimension y(3), ydot(3)}\cr
+  \code{common /myparms/parms}\cr
+    
+  \code{ydot(1) = -parms(1)*y(1) + parms(2)*y(2)*y(3)}\cr
+  \code{ydot(3) = parms(3)*y(2)*y(2)}\cr
+  \code{ydot(2) = -ydot(1) - ydot(3)}\cr
+    
+  \code{return}\cr
+  \code{end}\cr
+  
+  
+  In Fortran, parameters may be stored in a common block, in which
+  case, the file that contains the model function definition must also
+  contain a subroutine, again with the same name as the file which
+  contains the model definition:
+  
+  \code{subroutine mymod(odeparms)}\cr
+  \code{external odeparms}\cr
+  \code{integer N}\cr
+  \code{double precision parms(3)}\cr
+  \code{common /myparms/parms}\cr
+    
+  \code{N = 3}\cr
+  \code{call odeparms(N, parms)}\cr
+  \code{return}\cr
+  \code{end}\cr
+
+
+  When models are defined in compiled code, there is no provision for
+  returning quantities that are not directly solutions of the odes
+  (unlike models defined in R code).
+
+  If it is desired to supply a jacobian to the solver, then the jacobian
+  must be defined in compiled code if the ode system is.  The C function
+  call for such a function must be as in the following example:
+  
+  \code{void myjac(long int *neq, double *t, double *y, long int *ml,}\cr
+  \code{           long int *mu, double *pd, long int *nrowpd)}\cr
+  \code{\{}\cr
+    \code{pd[0] = -k1;}\cr
+    \code{pd[1] = k1;}\cr
+    \code{pd[2] = 0.0;}\cr
+    \code{pd[(*nrowpd)] = k2*y[2];}\cr
+    \code{pd[(*nrowpd) + 1] = -k2*y[2] - 2*k3*y[1];}\cr
+    \code{pd[(*nrowpd) + 2] = 2*k3*y[1];}\cr
+    \code{pd[(*nrowpd)*2] = k2*y[1];}\cr
+    \code{pd[2*(*nrowpd) + 1] = -k2 * y[1];}\cr
+    \code{pd[2*(*nrowpd) + 2] = 0.0;}\cr
+  \code{\}}\cr
+      
+The corresponding subroutine in Fortran is:
+
+\code{subroutine myjac (neq, t, y, ml, mu, pd, nrowpd)}\cr
+\code{integer neq, ml, mu, nrowpd}\cr
+\code{double precision y(*), pd(nrowpd,*), t, parms(3)}\cr
+\code{common /myparms/parms}\cr
+
+\code{pd(1,1) = -parms(1)}\cr
+\code{pd(2,1) =  parms(1)}\cr
+\code{pd(3,1) = 0.0}\cr
+\code{pd(1,2) = parms(2)*y(3)}\cr
+\code{pd(2,2) = -parms(2)*y(3) - 2*parms(3)*y(2)}\cr
+\code{pd(3,2) = 2*parms(3)*y(2)}\cr
+\code{pd(1,3) = parms(2)*y(2)}\cr
+\code{pd(2,3) = -parms(2)*y(2)}\cr
+\code{pd(3,3) = 0.0}\cr
+
+\code{return}\cr
+\code{end}\cr
+
+Examples in both C and Fortran are in the \file{dynload} subdirectory of
+the \code{odesolve} package directory.
+  
+
 }
 \value{
   A matrix with up to as many rows as elements in \code{times} and as
@@ -110,8 +255,13 @@ lsoda(y, times, func, parms, rtol, atol, tcrit=NULL,jac=NULL)
   
   Netlib: \url{http://www.netlib.org}
 }
-\author{R. Woodrow Setzer \email{setzer.woodrow@epa.gov}, fixups by
-Martin Maechler \email{maechler@stat.math.ethz.ch}}
+\note{
+  The \file{demo} directory contains some examples of using
+  \code{\link[nlme]{gnls}} to estimate parameters in a
+  dynamic model.
+  }
+
+\author{R. Woodrow Setzer \email{setzer.woodrow@epa.gov}}
 
 \examples{
 ### lsexamp -- example from lsoda source code
@@ -172,34 +322,5 @@ outJ <- lsoda(c(1,0,0),times,lsexamp, parms, rtol=1e-4, atol= my.atol,
   
 all.equal(out, outJ) # TRUE
 
-### example of an application to nonlinear regression
-if (require(gnlm)) {
-t <- 1:10
-
-# known initial conditions
-# explicit regression formula with gamma variability
-fn1 <- ~exp(-a*t)
-y <- rgamma(10, 2, finterp(fn1)(0.1)/2)
-print(gnlr(y, dist="gamma", mu=fn1, pmu=0.2, pshape=0))
-
-# regression formula defined by differential equation
-dfn <- function(t, y, p) list(-p*y)
-fn2 <- ~lsoda(1, c(0,t), dfn, p)[2:11,2]
-print(finterp(fn1)(0.1))
-print(finterp(fn2)(0.1))
-print(gnlr(y, dist="gamma", mu=fn2, pmu=0.2, pshape=0))
-
-# estimated initial conditions
-# explicit regression formula with gamma variability
-fn3 <- ~b*exp(-a*t)
-y <- rgamma(10, 2, finterp(fn3)(c(2,0.1))/2)
-print(gnlr(y, dist="gamma", mu=fn3, pmu=c(1,0.2), pshape=0))
-
-# regression formula defined by differential equation
-fn4 <- ~lsoda(b, c(0,t), dfn, a)[2:11,2]
-print(finterp(fn3)(c(1,0.1)))
-print(finterp(fn4)(c(1,0.1)))
-print(gnlr(y, dist="gamma", mu=fn4, pmu=c(1,0.2), pshape=0))
-}
 }
 \keyword{math}

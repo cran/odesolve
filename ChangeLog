@@ -1,4 +1,218 @@
-2001-05-09    <setzer@ERCUS03252140>
+2002-04-03  Woodrow Setzer  <setzer.woodrow@epa.gov>
+
+	* lsoda.Rd: fixed another link (nls)
+
+	* lsoda.Rd: fixed link for gnls to point to nlme package
+
+2002-04-02  Woodrow Setzer  <setzer.woodrow@epa.gov>
+
+	* lsoda.Rd:
+	arg was 'jacfunc', documented arg was 'jac', changed to 'jacfunc'
+
+	* lsoda.Rd: removed reference to nlme in demo directory.  next version.
+
+2002-04-02  Woodrow Setzer  <setzer.woodrow@epa.gov>
+
+	* demo/CCL4model.R: redefine 'concentrations'
+
+	* ChangeLog: minor cleanup
+
+	* DESCRIPTION:
+	updated dependency, date, version number, compiled code capability
+
+	* INDEX: updated data set descriptions
+
+	* data/00Index: added one-line descriptions
+
+	* man/lsoda.Rd:
+	arg was 'jacfunc', documented arg was 'jac', changed to 'jacfunc'
+
+	* demo/CCL4model.R: refined the gnls example.
+
+	* demo/00Index: removed nlme demo from index
+
+	* man/lsoda.Rd:
+	removed reference to nlme in demo directory.  next version.
+
+	* src/odesolve_utils.c:
+	added format to calls to error and warning in rstop and rwarn
+
+2002-04-02  Woodrow Setzer  <setzer.woodrow@epa.gov>
+
+	* DESCRIPTION:
+	updated dependency, date, version number, compiled code capability
+
+	* INDEX: updated data set descriptions
+
+	* data/00Index: added one-line descriptions
+
+	* man/lsoda.Rd:
+	arg was 'jacfunc', documented arg was 'jac', changed to 'jacfunc'
+
+	* demo/CCL4model.R: refined the gnls example.
+
+	* demo/00Index: removed nlme demo from index
+
+	* man/lsoda.Rd:
+	removed reference to nlme in demo directory.  next version.
+
+	* src/odesolve_utils.c:
+	added format to calls to error and warning in rstop and rwarn
+
+2002-03-29  Woodrow Setzer  <setzer.woodrow@epa.gov>
+
+	* demo/00Index: added nlme example, and dropped .R extension
+
+2002-03-28  Woodrow Setzer  <setzer.woodrow@epa.gov>
+
+	* man/ccl4data.Rd: update data description
+
+	* man/lsoda.Rd: editing help file.
+
+	* man/lsoda.Rd: problems with compiling the help file.
+
+	* man/lsoda.Rd: Fixed docs to include compiled code.
+
+	* inst/C/mymod.c, inst/C/testdynload.R, inst/dynload/C/mymod.c, inst/dynload/C/testdynload.R, inst/dynload/Fortran/mymod.f, inst/dynload/Fortran/testdynload.R, inst/dynload/Readme, inst/Fortran/mymod.f, inst/Fortran/testdynload.R: moving dynload examples to dynload subdir
+
+	* inst/dynload/C/mymod.c, inst/dynload/C/testdynload.R, inst/dynload/Fortran/mymod.f, inst/dynload/Fortran/testdynload.R, inst/dynload/Readme: New file.
+
+	* inst/Fortran/testdynload.R, inst/C/testdynload.R: Fixed call to lsoda
+
+	* src/xersve.f: removing DAE related files
+
+	* src/ddasrt.f, src/ddassl.f: removing DAE solver from current release
+
+2002-02-15  Woodrow Setzer  <setzer.woodrow@epa.gov>
+
+	* src/call_ddassl.c, src/lsodar.f, src/rchek.f, src/roots.f:
+	paring down to files just needed by lsoda
+
+	* R/odesolve.R: new interface delayed until next release
+
+2002-02-12  Woodrow Setzer  <setzer.woodrow@epa.gov>
+
+	* man/ccl4data.Rd, inst/Fortran/mymod.f, inst/Fortran/testdynload.R, inst/C/mymod.c, inst/C/testdynload.R, data/00Index, R/odesolve.R, INDEX:
+	moved dynload examples to subdir, updated lsoda.r
+
+	* R/lsoda.R:
+	added dllname as an argument; func is now a 1 element vector
+
+	* src/call_ddassl.c: beginning of coding call_ddassl
+
+	* src/odesolve.h: re added declaration of xsetf
+
+	* src/call_lsoda.c: can now turn on verbosity
+
+	* R/lsoda.R:
+	added the verbose argument to call_lsoda (fixed to 0; odesolve() will have it as a user-accessible argument)
+
+	* src/call_lsoda.c: readded xsetf
+
+	* src/xsetf.f:
+	readding xsetf; add a "verbose" argument to the R code to activate
+
+	* src/call_lsoda.c:
+	remove xsetf from call_lsoda (may restore this, turned on with a "verbose" option).
+
+	* src/call_lsoda.c:
+	added declaration of lsoda here (from odesolve.h), since this is the only
+	place it is needed.
+
+	* src/odesolve.h:
+	dropped declaration of xsetf; moved declaration of lsoda to call_lsoda.c
+
+2002-02-11  Woodrow Setzer  <setzer.woodrow@epa.gov>
+
+	* src/xsetf.f, src/xsetun.f: No longer used
+
+	* src/odesolve.h: removed openlog and closelog
+
+	* src/openlog.f:
+	not used any more
+
+	* src/R-stop.c:
+	Now in odesolve_utils.c
+
+	* src/call_lsoda.c:
+	moved Initodeparms to odesolve_utils.c, renamed global variables to odesolve_
+	form.  #include <R.h> and <Rdefines.h> are now in odesolve.h
+
+	* src/odesolve_utils.c: Added global variables and Initodeparms
+
+	* src/odesolve.h: Added externs for global variables, etc.
+
+	* R/odesolve.R: All solvers will be accessible under odesolve()
+
+2002-02-01  Woodrow Setzer  <setzer.woodrow@epa.gov>
+
+	* R/lsoda.R:
+	sanity check: continue only if the length of the initial condition vector equals the number of derivatives computed.
+
+	* man/lsoda.Rd: changed spelling: scaler -> scalar
+
+2002-01-21  Woodrow Setzer  <setzer.woodrow@epa.gov>
+
+	* R/lsoda.R: check that the model function returns a list.
+
+2001-12-21  Woodrow Setzer  <setzer.woodrow@epa.gov>
+
+	* demo/CCL4model.R: typos
+
+	* man/lsoda.Rd: removed long examples to demo
+
+	* demo/00Index: initial add of 00Index
+
+	* demo/nonlinreg.R: moved Linsay's example to demo
+
+	* demo/CCL4model.R: moved script from lsoda.Rd to this file
+
+	* demo/CCL4model.R, R/CCL4model.R: Moved CCL4model.R from R to demo
+
+	* inst/Fortran/mymod.f, inst/Fortran/testdynload.R:
+	Fortran dynload example
+
+	* inst/C/mymod.c, inst/C/testdynload.R: C dynload example
+
+	* data/ccl4data.avg.rda, data/ccl4data.rda: changed to ascii save
+
+	* data/00Index: descriptions of data
+
+	* R/lsoda.R, src/call_lsoda.c: typo
+
+	* src/call_lsoda.c: pass Initodeparms to initializer
+
+	* src/call_lsoda.c: typo
+
+	* src/odesolve.h: fixed up declaration of call_lsoda
+
+	* src/odesolve.h:
+	removed declaration of lsoda_derivs and lsoda_jac, since they are now declared static in call_lsoda.c
+
+	* src/call_lsoda.c: typo fix
+
+	* src/call_lsoda.c:
+	Some fixes around atol and rtol, and added code to use compiled ode defs.
+
+	* man/lsoda.Rd: added a reassuring line just before the call to gnls
+
+	* man/lsoda.Rd: moved 'concentrations <- up
+
+	* man/lsoda.Rd: escaped % chars
+
+	* man/lsoda.Rd: Added pbpk example
+
+	* R/lsoda.R: fixed type
+
+	* R/lsoda.R: Added code for dynloaded ode definitions
+
+	* R/CCL4model.R: PBPK model for documentation
+
+	* man/ccl4data.avg.Rd, man/ccl4data.Rd: Data documentation
+
+	* data/ccl4data.avg.rda, data/ccl4data.rda: Adding example datasets
+
+2001-05-09 Woodrow Setzer <setzer.woodrow@epa.gov>   
 
 	* man/lsoda.Rd:  conditionalized the regression example using gnlm
 

@@ -1,18 +1,18 @@
 #include <time.h>
 #include <string.h>
 
-#include <R.h>
-#include <Rdefines.h>
-
 #include "odesolve.h"
 
-/* Globals :*/ 
-SEXP deriv_func;
-SEXP jac_func;
-SEXP envir;
-SEXP gparms;
+void F77_NAME(lsoda)(void (*)(long int *, double *, double *, double *),
+		     long int *, double *, double *, double *,
+		     long int *, double *, double *, long int *, long int *,
+		     long int *, double *,long int *,long int *, long int *,
+		     void (*)(long int *, double *, double *, long int *,
+			      long int *, double *, long int *),
+		     long int *);
 
-void lsoda_derivs (long int *neq, double *t, double *y, double *ydot)
+
+static void lsoda_derivs (long int *neq, double *t, double *y, double *ydot)
 {
   int i;
   SEXP R_fcall, ans, Time, Y;
@@ -24,8 +24,10 @@ void lsoda_derivs (long int *neq, double *t, double *y, double *ydot)
     {
       REAL(Y)[i] = y[i];
     }
-  PROTECT(R_fcall = lang4(deriv_func,Time,Y,gparms));incr_N_Protect();
-  PROTECT(ans = eval(R_fcall, envir));incr_N_Protect();
+  PROTECT(R_fcall = lang4(odesolve_deriv_func,Time,Y,odesolve_gparms));
+  incr_N_Protect();
+  PROTECT(ans = eval(R_fcall, odesolve_envir));
+  incr_N_Protect();
   for (i = 0; i < *neq; i++)
     {
 #if R_VERSION >= R_Version(1, 2, 0)
@@ -37,7 +39,7 @@ void lsoda_derivs (long int *neq, double *t, double *y, double *ydot)
   my_unprotect(4);
 }
 
-void lsoda_jac (long int *neq, double *t, double *y, long int *ml,
+static void lsoda_jac (long int *neq, double *t, double *y, long int *ml,
 		    long int *mu, double *pd, long int *nrowpd)
 {
   int i, j;
@@ -50,8 +52,10 @@ void lsoda_jac (long int *neq, double *t, double *y, long int *ml,
     {
       REAL(Y)[i] = y[i];
     }
-  PROTECT(R_fcall = lang4(jac_func,Time,Y,gparms));incr_N_Protect();
-  PROTECT(ans = eval(R_fcall, envir));incr_N_Protect();
+  PROTECT(R_fcall = lang4(odesolve_jac_func,Time,Y,odesolve_gparms));
+  incr_N_Protect();
+  PROTECT(ans = eval(R_fcall, odesolve_envir));
+  incr_N_Protect();
   for (i = 0; i < *neq; i++)
     for (j = 0; j < *neq; j++)
     {
@@ -62,34 +66,52 @@ void lsoda_jac (long int *neq, double *t, double *y, long int *ml,
 
 
 SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
-		SEXP atol, SEXP rho, SEXP tcrit, SEXP jacfunc)
+		SEXP atol, SEXP rho, SEXP tcrit, SEXP jacfunc, SEXP initfunc,
+		SEXP verbose)
 {
   SEXP yout, yout2, ISTATE;
   int i, j, k, ny, nt, repcount, latol, lrtol, nprot;
-  double *xt, *xytmp, *rwork, tin, tout;
+  double *xt, *xytmp, *rwork, tin, tout, *Atol, *Rtol;
   long int neq, itol, itask, istate, iopt, lrw, liw, *iwork, jt, lrn, lrs,
     mflag, lstamp, lfnm, lunit;
+  void (*derivs)(long int *, double *, double *,double *);
   void (*jac)(long int *, double *, double *, long int *,
 	      long int *, double *, long int *);
+  void (*initializer)(void(*)());
   time_t result;
 
   init_N_Protect();
 
   ny = LENGTH(y);
   neq = ny;
-  mflag = 0;
+  mflag = INTEGER(verbose)[0];
   F77_CALL(xsetf)(&mflag);
   xytmp = (double *) R_alloc(neq, sizeof(double));
   for (j = 0; j < ny; j++) xytmp[j] = REAL(y)[j];
   nt = LENGTH(times);
   nprot = 0;
-  PROTECT(deriv_func = func); incr_N_Protect();
-  PROTECT(envir = rho);incr_N_Protect();
   PROTECT(yout = allocMatrix(REALSXP,ny+1,nt));incr_N_Protect();
-  PROTECT(gparms = parms); incr_N_Protect();
+  PROTECT(odesolve_gparms = parms); incr_N_Protect();
+  if (inherits(func, "NativeSymbol")) 
+    {
+      derivs = R_ExternalPtrAddr(func);
+      /* If there is an initializer, use it here */
+      if (!isNull(initfunc))
+	{
+	  initializer = R_ExternalPtrAddr(initfunc);
+	  initializer(Initodeparms);
+	}
+	  
+    } else {
+      derivs = lsoda_derivs;
+      PROTECT(odesolve_deriv_func = func); incr_N_Protect();
+      PROTECT(odesolve_envir = rho);incr_N_Protect();
+    }
   xt = NUMERIC_POINTER(times);
   latol = LENGTH(atol);
+  Atol = (double *) R_alloc((long int) latol, sizeof(double));
   lrtol = LENGTH(rtol);
+  Rtol = (double *) R_alloc((long int) lrtol, sizeof(double));
   if (latol == 1 && lrtol == 1 ) itol = 1;
   if (latol  > 1 && lrtol == 1 ) itol = 2;
   if (latol == 1 && lrtol  > 1 ) itol = 3;
@@ -114,8 +136,15 @@ SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
   iwork = (long int *) R_alloc(liw, sizeof(long int));
   if (!isNull(jacfunc))
     {
-      jac_func = jacfunc;
-      jac = lsoda_jac;
+      if (inherits(jacfunc,"NativeSymbol"))
+	{
+	  jac = R_ExternalPtrAddr(jacfunc);
+	}
+      else
+	{
+	  odesolve_jac_func = jacfunc;
+	  jac = lsoda_jac;
+	}
       jt = 1;
     }
   else
@@ -132,18 +161,20 @@ SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
       tin = REAL(times)[i];
       tout = REAL(times)[i+1];
       repcount = 0;
+      for (j = 0; j < lrtol; j++) Rtol[j] = REAL(rtol)[j];
+      for (j = 0; j < latol; j++) Atol[j] = REAL(atol)[j];
       do
 	{
 	  if (istate == -1) istate = 2;
 	  if (istate == -2)
 	    {
-	      for (j = 0; j < lrtol; j++) REAL(rtol)[j] *= rwork[13];
-	      for (j = 0; j < latol; j++) REAL(atol)[j] *= rwork[13];
-	      warning("Excessive precision requested.  `rtol' and `atol' have been scaled upwards by the factor %g\n",rwork[13]);
+	      for (j = 0; j < lrtol; j++) Rtol[j] *= 10.0;
+	      for (j = 0; j < latol; j++) Atol[j] *= 10.0;
+	      warning("Excessive precision requested.  `rtol' and `atol' have been scaled upwards by the factor %g\n",10.0);
 	      istate = 3;
 	      
 	    }
-	  F77_CALL(lsoda) (lsoda_derivs, &neq, xytmp, &tin, &tout,
+	  F77_CALL(lsoda) (derivs, &neq, xytmp, &tin, &tout,
 			   &itol, NUMERIC_POINTER(rtol), NUMERIC_POINTER(atol), &itask, &istate, &iopt, rwork,
 			   &lrw, iwork, &liw, jac, &jt);
 	  repcount ++;

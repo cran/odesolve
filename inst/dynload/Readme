@@ -1,0 +1,17 @@
+The directories contain a simple example, in both C and Fortran, of
+using a compiled function definition with lsoda().  In order to use
+this feature, you must be able to compile a source package.  To run
+the examples, first change to the directory specific to the language
+(C or Fortran) you want to use.  You must have write-access to that
+directory (so, you might need to copy the files to another
+directory).  Issue the command to create the dll.  On UNIX, it is
+(assuming you are working in the C subdirectory:
+
+R CMD SHLIB mymod.c
+
+Then, 
+
+R --slave < testdynload.R
+
+will run the example.  Of course, the main point is to read the source
+code! 
