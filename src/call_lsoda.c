@@ -60,6 +60,9 @@ static void lsoda_jac (long int *neq, double *t, double *y, long int *ml,
   my_unprotect(4);
 }
 
+typedef void deriv_func(long int *, double *, double *,double *);
+typedef void jac_func(long int *, double *, double *, long int *,
+		      long int *, double *, long int *);
 
 SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
 		SEXP atol, SEXP rho, SEXP tcrit, SEXP jacfunc, SEXP initfunc,
@@ -70,9 +73,12 @@ SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
   double *xt, *xytmp, *rwork, tin, tout, *Atol, *Rtol;
   long int neq, itol, itask, istate, iopt, lrw, liw, *iwork, jt, lrn, lrs,
     mflag, lstamp, lfnm, lunit;
-  void (*derivs)(long int *, double *, double *,double *);
+  /* void (*derivs)(long int *, double *, double *,double *);
   void (*jac)(long int *, double *, double *, long int *,
 	      long int *, double *, long int *);
+  */
+  deriv_func *derivs;
+  jac_func *jac;
   void (*initializer)(void(*)());
   time_t result;
 
@@ -90,7 +96,7 @@ SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
   PROTECT(odesolve_gparms = parms); incr_N_Protect();
   if (inherits(func, "NativeSymbol")) 
     {
-      derivs = R_ExternalPtrAddr(func);
+      derivs = (deriv_func *) R_ExternalPtrAddr(func);
       /* If there is an initializer, use it here */
       if (!isNull(initfunc))
 	{
@@ -99,7 +105,7 @@ SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
 	}
 	  
     } else {
-      derivs = lsoda_derivs;
+      derivs = (deriv_func *) lsoda_derivs;
       PROTECT(odesolve_deriv_func = func); incr_N_Protect();
       PROTECT(odesolve_envir = rho);incr_N_Protect();
     }
@@ -131,7 +137,6 @@ SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
   liw = 20 + neq;
   iwork = (long int *) R_alloc(liw, sizeof(long int));
 
-  // start patch of thpe
   for (i=4; i<10; i++) {
     rwork[i]=0.0;
     iwork[i]=0;
@@ -139,13 +144,12 @@ SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
   rwork[5] = REAL(hmax)[0];
   rwork[6] = REAL(hmin)[0];
   if (rwork[5] >0 || rwork[6] >0) iopt = 1;
-  // end patch of thpe
 
   if (!isNull(jacfunc))
     {
       if (inherits(jacfunc,"NativeSymbol"))
 	{
-	  jac = R_ExternalPtrAddr(jacfunc);
+	  jac = (jac_func *) R_ExternalPtrAddr(jacfunc);
 	}
       else
 	{

@@ -1,3 +1,8 @@
+2004-02-06  R. Woodrow Setzer  <setzer@localhost.localdomain>
+
+	* rk4.R: added Thomas Petzold's fix
+	* lsoda.R: cleaned up some old comments
+
 2002-04-03  Woodrow Setzer  <setzer.woodrow@epa.gov>
 
 	* lsoda.Rd: fixed another link (nls)

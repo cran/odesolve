@@ -27,10 +27,10 @@ rk4 <- function(y, times, func, parms) {
     for (i in 1:(length(times)-1)) {
         t  <- times[i]
         dt <- times[i+1] - times[i]
-        F1 <- dt * unlist(func(t,      y0,            parms))
-        F2 <- dt * unlist(func(t+dt/2, y0 + 0.5 * F1, parms))
-        F3 <- dt * unlist(func(t+dt/2, y0 + 0.5 * F2, parms))
-        F4 <- dt * unlist(func(t+dt  , y0 + F3,       parms))
+        F1 <- dt * func(t,      y0,            parms)[[1]]
+        F2 <- dt * func(t+dt/2, y0 + 0.5 * F1, parms)[[1]]
+        F3 <- dt * func(t+dt/2, y0 + 0.5 * F2, parms)[[1]]
+        F4 <- dt * func(t+dt  , y0 + F3,       parms)[[1]]
         dy <- (F1 + 2 * F2 + 2 * F3 + F4)/6
         y1 <- y0 + dy
         out<- rbind(out, c(times[i+1], y1))
@@ -40,10 +40,10 @@ rk4 <- function(y, times, func, parms) {
     nm <- c("time", if (!is.null(attr(y, "names")))
             names(y) else as.character(1:n))
     if (Nglobal > 0) {
-        out2 <- matrix( nrow=Nglobal, ncol=ncol(out))
-        for (i in 1:ncol(out2))
-            out2[,i] <- func(out[1,i],out[-1,i],parms)[[2]]
-        out <- rbind(out,out2)
+        out2 <- matrix(nrow=nrow(out), ncol=Nglobal)
+        for (i in 1:nrow(out2))
+            out2[i,] <- func(out[i,1], out[i,-1], parms)[[2]]
+        out <- cbind(out, out2)
         nm <- c(nm,
                 if (!is.null(attr(tmp[[2]],"names"))) names(tmp[[2]])
                 else as.character((n+1) : (n + Nglobal)))
