@@ -119,7 +119,7 @@ verbose=FALSE, dllname=NULL, hmin=0, hmax=Inf)
   For C, the calling sequence for func must be as in the following
   example:
   
-  \code{void myderivs(long int *neq, double *t, double *y, double *ydot)}\cr
+  \code{void myderivs(int *neq, double *t, double *y, double *ydot)}\cr
   \code{\{}\cr
     \code{ydot[0] = -k1*y[0] + k2*y[1]*y[2];}\cr
     \code{ydot[2] = k3 * y[1]*y[1];}\cr
@@ -149,14 +149,14 @@ verbose=FALSE, dllname=NULL, hmin=0, hmax=Inf)
   values into the global variable.  In the example here, the library
   is named \file{mymod.so}, a function such as:
   
-  \code{void mymod(void (* odeparms)(long int *, double *))}\cr
+  \code{void mymod(void (* odeparms)(int *, double *))}\cr
   \code{\{}\cr
-    \code{long int N=3;}\cr
+    \code{int N=3;}\cr
     \code{odeparms(&N, parms);}\cr
   \code{\}}\cr
 
 will be required to initialize the parameter vector.  Here
-  \code{mymod} just calls \code{odeparms} with a pointer to a long int
+  \code{mymod} just calls \code{odeparms} with a pointer to a int
   that contains the dimension of the parameter vector, and a pointer to
   the array that will contain the parameter values.
   
@@ -201,8 +201,8 @@ will be required to initialize the parameter vector.  Here
   must be defined in compiled code if the ode system is.  The C function
   call for such a function must be as in the following example:
   
-  \code{void myjac(long int *neq, double *t, double *y, long int *ml,}\cr
-  \code{           long int *mu, double *pd, long int *nrowpd)}\cr
+  \code{void myjac(int *neq, double *t, double *y, int *ml,}\cr
+  \code{           int *mu, double *pd, int *nrowpd)}\cr
   \code{\{}\cr
     \code{pd[0] = -k1;}\cr
     \code{pd[1] = k1;}\cr

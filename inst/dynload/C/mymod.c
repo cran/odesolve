@@ -10,14 +10,14 @@ static double parms[3];
 #define k3 parms[2]
 
 /* initializer */
-void mymod(void (* odeparms)(long int *, double *))
+void mymod(void (* odeparms)(int *, double *))
 {
-    long int N=3;
+    int N=3;
     odeparms(&N, parms);
 }
 
 /* Derivatives */
-void myderivs(long int *neq, double *t, double *y, double *ydot)
+void myderivs(int *neq, double *t, double *y, double *ydot)
 {
     ydot[0] = -k1*y[0] + k2*y[1]*y[2];
     ydot[2] = k3 * y[1]*y[1];
@@ -25,8 +25,8 @@ void myderivs(long int *neq, double *t, double *y, double *ydot)
 }
 
 /* Jacobian */
-void myjac(long int *neq, double *t, double *y, long int *ml,
-                  long int *mu, double *pd, long int *nrowpd)
+void myjac(int *neq, double *t, double *y, int *ml,
+                  int *mu, double *pd, int *nrowpd)
 {
     pd[0] = -k1;
     pd[1] = k1;

@@ -1,4 +1,38 @@
+2004-10-25  R. Woodrow Setzer  <setzer@node24.cluster2.org>
+
+	* man/lsoda.Rd:
+	changed all references to long int to be references to int
+
+	* inst/dynload/c/mymod.c: changed long int to int
+
+	* ChangeLog, DESCRIPTION: updated to 0.5-12
+
+	* src/call_lsoda.c:
+	changed all "long int"s to "int"s per email from Brian Ripley.
+	Presumably odesolve is now safe for 64-bit OSs.
+
+2004-10-25  R. Woodrow Setzer  <setzer@node24.cluster2.org>
+
+	* src/call_lsoda.c:
+	changed all "long int"s to "int"s per email from Brian Ripley.
+	Presumably odesolve is now safe for 64-bit OSs.
+
 2004-10-12  R. Woodrow Setzer  <setzer@node24.cluster2.org>
+
+	* DESCRIPTION, ToDo, ChangeLog:
+	ToDo unneccesary, updated ChangeLog and DESCRIPTION
+
+	* src/xercnt.f: unused file
+
+	* src/call_lsoda.c, src/intdy.f, src/lsoda.f, src/xerrwv.f, src/xsetf.f:
+	unneeded files
+
+	* src/call_lsoda.c: removed call to xsetf
+
+	* R/zzz.R: Added 'libname' to call to library.dynam
+
+	* ChangeLog, DESCRIPTION:
+	Updated ChangeLog, current date in DESCRIPTION
 
 	* src/dgbfa.f, src/dgbsl.f, src/dgefa.f, src/dgesl.f:
 	deleted by mistake
@@ -19,6 +53,45 @@
 
 	* src/lsoda.f:
 	replaced all references to xerrwv with references to rwarn
+
+2004-10-12  R. Woodrow Setzer  <setzer@node24.cluster2.org>
+
+	* src/xercnt.f: unused file
+
+	* src/call_lsoda.c, src/intdy.f, src/lsoda.f, src/xerrwv.f, src/xsetf.f:
+	fixes added from version 0.5-11
+
+	* src/call_lsoda.c: removed call to xsetf
+
+	* R/zzz.R: Added 'libname' to call to library.dynam
+
+	* ChangeLog, DESCRIPTION:
+	Updated ChangeLog, current date in DESCRIPTION
+
+	* src/dgbfa.f, src/dgbsl.f, src/dgefa.f, src/dgesl.f:
+	deleted by mistake
+	: ---------------------------------------------------------------------
+
+	* src/lsoda.f: corrected typo
+
+	* src/intdy.f: removed use of xerrwv in favor of rwarn
+
+	* src/dgbfa.f, src/dgbsl.f, src/dgefa.f, src/dgesl.f:
+	use R's internal code for these
+
+	* src/xerrwv.f: no longer needed: use rwarn directly.
+
+	* src/xerrwv.f: deleted unnecessary code
+
+	* src/xsetf.f: removed: no longer needed.
+
+	* src/lsoda.f:
+	replaced all references to xerrwv with references to rwarn
+
+2004-10-01  R. Woodrow Setzer  <setzer@node24.cluster2.org>
+
+	* src/call_lsoda.c, src/i1mach.f, src/odesolve.h, src/odesolve_utils.c, src/xerrwv.f:
+	Allow names attribute on state var to be passed, and use R's rwarn and rexit
 
 2004-10-01  R. Woodrow Setzer  <setzer@node24.cluster2.org>
 

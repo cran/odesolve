@@ -3,16 +3,16 @@
 
 #include "odesolve.h"
 
-void F77_NAME(lsoda)(void (*)(long int *, double *, double *, double *),
-		     long int *, double *, double *, double *,
-		     long int *, double *, double *, long int *, long int *,
-		     long int *, double *,long int *,long int *, long int *,
-		     void (*)(long int *, double *, double *, long int *,
-			      long int *, double *, long int *),
-		     long int *);
+void F77_NAME(lsoda)(void (*)(int *, double *, double *, double *),
+		     int *, double *, double *, double *,
+		     int *, double *, double *, int *, int *,
+		     int *, double *,int *,int *, int *,
+		     void (*)(int *, double *, double *, int *,
+			      int *, double *, int *),
+		     int *);
 
 
-static void lsoda_derivs (long int *neq, double *t, double *y, double *ydot)
+static void lsoda_derivs (int *neq, double *t, double *y, double *ydot)
 {
   int i;
   SEXP R_fcall, ans, Time, Y;
@@ -36,8 +36,8 @@ static void lsoda_derivs (long int *neq, double *t, double *y, double *ydot)
   my_unprotect(4);
 }
 
-static void lsoda_jac (long int *neq, double *t, double *y, long int *ml,
-		    long int *mu, double *pd, long int *nrowpd)
+static void lsoda_jac (int *neq, double *t, double *y, int *ml,
+		    int *mu, double *pd, int *nrowpd)
 {
   int i, j;
   SEXP R_fcall, ans, Time, Y;
@@ -62,10 +62,10 @@ static void lsoda_jac (long int *neq, double *t, double *y, long int *ml,
   my_unprotect(4);
 }
 
-typedef void deriv_func(long int *, double *, double *,double *);
-typedef void jac_func(long int *, double *, double *, long int *,
-		      long int *, double *, long int *);
-typedef void init_func(void (*)(long int *, double *));
+typedef void deriv_func(int *, double *, double *,double *);
+typedef void jac_func(int *, double *, double *, int *,
+		      int *, double *, int *);
+typedef void init_func(void (*)(int *, double *));
 
 SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
 		SEXP atol, SEXP rho, SEXP tcrit, SEXP jacfunc, SEXP initfunc,
@@ -74,11 +74,11 @@ SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
   SEXP yout, yout2, ISTATE;
   int i, j, k, ny, nt, repcount, latol, lrtol, nprot;
   double *xt, *xytmp, *rwork, tin, tout, *Atol, *Rtol;
-  long int neq, itol, itask, istate, iopt, lrw, liw, *iwork, jt, lrn, lrs,
+  int neq, itol, itask, istate, iopt, lrw, liw, *iwork, jt, lrn, lrs,
     mflag, lstamp, lfnm, lunit;
-  /* void (*derivs)(long int *, double *, double *,double *);
-  void (*jac)(long int *, double *, double *, long int *,
-	      long int *, double *, long int *);
+  /* void (*derivs)(int *, double *, double *,double *);
+  void (*jac)(int *, double *, double *, int *,
+	      int *, double *, int *);
   */
   deriv_func *derivs;
   jac_func *jac;
@@ -116,9 +116,9 @@ SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
     }
   xt = NUMERIC_POINTER(times);
   latol = LENGTH(atol);
-  Atol = (double *) R_alloc((long int) latol, sizeof(double));
+  Atol = (double *) R_alloc((int) latol, sizeof(double));
   lrtol = LENGTH(rtol);
-  Rtol = (double *) R_alloc((long int) lrtol, sizeof(double));
+  Rtol = (double *) R_alloc((int) lrtol, sizeof(double));
   if (latol == 1 && lrtol == 1 ) itol = 1;
   if (latol  > 1 && lrtol == 1 ) itol = 2;
   if (latol == 1 && lrtol  > 1 ) itol = 3;
@@ -140,7 +140,7 @@ SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
   rwork = (double *) R_alloc(lrw, sizeof(double));
   if (itask == 4) rwork[0] = REAL(tcrit)[0];
   liw = 20 + neq;
-  iwork = (long int *) R_alloc(liw, sizeof(long int));
+  iwork = (int *) R_alloc(liw, sizeof(int));
 
   for (i=4; i<10; i++) {
     rwork[i]=0.0;
