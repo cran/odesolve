@@ -1,3 +1,35 @@
+2004-04-05  R. Woodrow Setzer  <setzer@localhost.localdomain>
+
+	* R/lsoda.R: added PACKAGE argument to .Call()
+
+	* src/call_lsoda.c: fixing typos
+
+	* ChangeLog: update for version 0-5-10
+
+	* src/call_lsoda.c: Fixed function pointer for initializer
+
+	* DESCRIPTION: Updated date and version number
+
+2004-04-05  R. Woodrow Setzer  <setzer@localhost.localdomain>
+
+	* src/call_lsoda.c: Fixed function pointer for initializer
+
+	* DESCRIPTION: Updated date and version number
+
+2004-02-10  R. Woodrow Setzer  <setzer@localhost.localdomain>
+
+	* DESCRIPTION: Updated the package date.
+
+2004-02-07  R. Woodrow Setzer  <setzer@localhost.localdomain>
+
+	* src/call_lsoda.c, R/lsoda.R, R/rk4.R, ChangeLog:
+	fixed rk4.R (Thomas Petzold fixes); removed comments from lsoda.R
+	and call_lsoda.c; added typcast to call_lsoda.c
+
+2004-02-06  R. Woodrow Setzer  <setzer@localhost.localdomain>
+
+	* R/lsoda.R, R/rk4.R: cosmetic fix for lsoda.R, and TEPs fix for rk4
+
 2004-02-06  R. Woodrow Setzer  <setzer@localhost.localdomain>
 
 	* rk4.R: added Thomas Petzold's fix

@@ -102,7 +102,8 @@ lsoda <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
       Nglobal <- if (length(tmp) > 1) length(tmp[[2]]) else 0
     }
     out <- .Call("call_lsoda",as.double(y),as.double(times),func,parms,
-                 rtol, atol, rho, tcrit, jacfunc, ModelInit, as.integer(verbose), hmin, hmax)
+                 rtol, atol, rho, tcrit, jacfunc, ModelInit,
+                 as.integer(verbose), hmin, hmax, PACKAGE="odesolve")
     istate <- attr(out,"istate")
     nm <- c("time",
             if (!is.null(attr(y,"names"))) names(y) else as.character(1:n))

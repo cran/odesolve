@@ -63,6 +63,7 @@ static void lsoda_jac (long int *neq, double *t, double *y, long int *ml,
 typedef void deriv_func(long int *, double *, double *,double *);
 typedef void jac_func(long int *, double *, double *, long int *,
 		      long int *, double *, long int *);
+typedef void init_func(void (*)(long int *, double *));
 
 SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
 		SEXP atol, SEXP rho, SEXP tcrit, SEXP jacfunc, SEXP initfunc,
@@ -79,7 +80,7 @@ SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
   */
   deriv_func *derivs;
   jac_func *jac;
-  void (*initializer)(void(*)());
+  init_func *initializer;
   time_t result;
 
   init_N_Protect();
@@ -100,7 +101,7 @@ SEXP call_lsoda(SEXP y, SEXP times, SEXP func, SEXP parms, SEXP rtol,
       /* If there is an initializer, use it here */
       if (!isNull(initfunc))
 	{
-	  initializer = R_ExternalPtrAddr(initfunc);
+	  initializer = (init_func *) R_ExternalPtrAddr(initfunc);
 	  initializer(Initodeparms);
 	}
 	  
