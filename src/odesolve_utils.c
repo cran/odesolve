@@ -29,9 +29,9 @@ SEXP odesolve_envir;
 SEXP odesolve_gparms;
 SEXP odesolve_Y_names;
 
-void Initodeparms(long int *N, double *parms)
+void Initodeparms(int *N, double *parms)
 {
-  long int i, Nparms;
+  int i, Nparms;
 
   Nparms = LENGTH(odesolve_gparms);
   if ((*N) != Nparms)

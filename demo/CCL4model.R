@@ -4,39 +4,41 @@
 initparms <- function(...) {
   arglist <- list(...)
   Pm <- numeric(36)
+  ## The Changeable parameters are ones that can be modified on input
   Changeable <- c("BW","QP","QC","VFC","VLC","VMC","QFC","QLC","QMC",
-                 "PLA","PFA","PMA","PTA","PB","MW","VMAX","KM",
-                 "CONC","KL","RATS","VCHC")
+                  "PLA","PFA","PMA","PTA","PB","MW","VMAX","KM",
+                  "CONC","KL","RATS","VCHC")
+  ## Computed parameters are strictly functions of the Changeable ones.
   Computed <- c("VCH","AI0","PL","PF","PT","PM","VTC","VT","VF","VL","VM",
-                 "QF","QL","QM","QT")
+                "QF","QL","QM","QT")
   names(Pm) <- c(Changeable,
                  Computed
                  )
 ### Physiological parameters
   Pm["BW"] <- 0.182                     # Body weight (kg)
-  Pm["QP"] <- 4.0                       # Alveolar ventilation rate (hr^-1)
+  Pm["QP"] <- 4.0                  # Alveolar ventilation rate (hr^-1)
   Pm["QC"] <- 4.0                       # Cardiac output (hr^-1)
-  Pm["VFC"] <- 0.08                     # Fraction fat tissue (kg/(kg/BW))
-  Pm["VLC"] <- 0.04                     # Fraction liver tissue (kg/(kg/BW))
-  Pm["VMC"] <- 0.74                     # Fraction of muscle tissue (kg/(kg/BW))
-  Pm["QFC"] <- 0.05                     # Fractional blood flow to fat ((hr^-1)/QC
-  Pm["QLC"] <- 0.15                     # Fractional blood flow to liver ((hr^-1)/QC)
-  Pm["QMC"] <- 0.32                     # Fractional blood flow to muscle ((hr^-1)/QC)
+  Pm["VFC"] <- 0.08                 # Fraction fat tissue (kg/(kg/BW))
+  Pm["VLC"] <- 0.04               # Fraction liver tissue (kg/(kg/BW))
+  Pm["VMC"] <- 0.74           # Fraction of muscle tissue (kg/(kg/BW))
+  Pm["QFC"] <- 0.05         # Fractional blood flow to fat ((hr^-1)/QC
+  Pm["QLC"] <- 0.15      # Fractional blood flow to liver ((hr^-1)/QC)
+  Pm["QMC"] <- 0.32     # Fractional blood flow to muscle ((hr^-1)/QC)
 
   ## Chemical specific parameters for chemical
-  Pm["PLA"] <- 16.17                    # Liver/air partition coefficient
-  Pm["PFA"] <- 281.48                   # Fat/air partition coefficient
-  Pm["PMA"] <- 13.3                     # Muscle/air partition coefficient
-  Pm["PTA"] <- 16.17                    # Viscera/air partition coefficient
-  Pm["PB"] <- 5.487                     # Blood/air partition coefficient
+  Pm["PLA"] <- 16.17                 # Liver/air partition coefficient
+  Pm["PFA"] <- 281.48                  # Fat/air partition coefficient
+  Pm["PMA"] <- 13.3                 # Muscle/air partition coefficient
+  Pm["PTA"] <- 16.17               # Viscera/air partition coefficient
+  Pm["PB"] <- 5.487                  # Blood/air partition coefficient
   Pm["MW"] <- 153.8                     # Molecular weight (g/mol)
-  Pm["VMAX"] <- 0.11                    # Maximum velocity of metabolism (mg/hr)
-  Pm["KM"] <- 1.3                        # Michaelis-Menten constant (mg/l)
+  Pm["VMAX"] <- 0.11          # Maximum velocity of metabolism (mg/hr)
+  Pm["KM"] <- 1.3                   # Michaelis-Menten constant (mg/l)
 
   ## Parameters for simulated experiment
   Pm["CONC"] <- 1000                    # Inhaled concentration
-  Pm["KL"] <- 0.02                      # Loss rate from empty chamber /hr
-  Pm["RATS"] <- 1.0                     # Number of rats enclosed in chamber
+  Pm["KL"] <- 0.02                  # Loss rate from empty chamber /hr
+  Pm["RATS"] <- 1.0               # Number of rats enclosed in chamber
   Pm["VCHC"] <- 3.8                     # Volume of closed chamber (l)
 
   ## Now, change anything from the argument list
@@ -55,8 +57,8 @@ initparms <- function(...) {
   
   ## Computed parameter values
 
-  Pm["VCH"] <- Pm["VCHC"] - Pm["RATS"]*Pm["BW"]# Net chamber volume
-  Pm["AI0"] <- Pm["CONC"]*Pm["VCH"]*Pm["MW"]/24450# Initial amt. in chamber (mg)
+  Pm["VCH"] <- Pm["VCHC"] - Pm["RATS"]*Pm["BW"] # Net chamber volume
+  Pm["AI0"] <- Pm["CONC"]*Pm["VCH"]*Pm["MW"]/24450 # Initial amt. in chamber (mg)
   Pm[c("PL","PF","PT","PM")] <- Pm[c("PLA","PFA","PTA","PMA")]/Pm["PB"]
 
   ## Fraction viscera (kg/(kg BW))
@@ -79,8 +81,7 @@ initparms <- function(...) {
 ### and the mass balance (MASS), which should be constant if everything
 ### worked right.
 
-## State variable, y, assignments.  A name attribute would get stripped off,
-## so just label the elements here.
+## State variable, y, assignments.
 
 ## CI   CM  CT  CF  CL     
 ## AI  AAM  AT  AF  AL  CLT  AM
@@ -93,31 +94,33 @@ initstate.orig <- function(Pm) {
   y
 }
 
-ccl4model.orig <- function(t, y, parms) {
-  conc <- y[1:5]/parms[c("VCH","VM","VT","VF","VL")]
+parms <- initparms()
+
+ccl4model.orig <- with(as.list(parms),function(t, y, parms) {
+  conc <- y[c("AI","AAM","AT","AF","AL")]/c(VCH,VM,VT,VF,VL)
   ## Vconc[1] is conc in mixed venous blood
   Vconc <- c(0,conc[2:5]/parms[c("PM","PT","PF","PL")]) # '0' is a placeholder
-  Vconc[1] <- sum(Vconc[2:5]*parms[c("QM","QT","QF","QL")])/parms["QC"]
+  Vconc[1] <- sum(Vconc[2:5]*c(QM,QT,QF,QL))/QC
   ## CA is conc in arterial blood
-  CA <- (parms["QC"] * Vconc[1] + parms["QP"]*conc[1])/
-    (parms["QC"] + parms["QP"]/parms["PB"])
+  CA <- (QC * Vconc[1] + QP * conc[1])/
+    (QC + QP/PB)
 
   ## Exhaled chemical
-  CX <- CA/parms["PB"]
+  CX <- CA/PB
   ## return the derivatives and other computed items
-  list(c(parms["RATS"]*parms["QP"]*(CX - conc[1]) - parms["KL"]*y[1],
-         parms["QM"]*(CA - Vconc[2]),
-         parms["QT"]*(CA - Vconc[3]),
-         parms["QF"]*(CA - Vconc[4]),
-         parms["QL"]*(CA - Vconc[5]) -
-           (RAM <- parms["VMAX"]*Vconc[5]/(parms["KM"] + Vconc[5])),
+  list(c(RATS*QP*(CX - conc[1]) - KL*y["AI"],
+         QM*(CA - Vconc[2]),
+         QT*(CA - Vconc[3]),
+         QF*(CA - Vconc[4]),
+         QL*(CA - Vconc[5]) -
+           (RAM <- VMAX*Vconc[5]/(KM + Vconc[5])),
          conc[5],
          RAM),
-       c(DOSE = as.vector(parms["AI0"] - y[1]),
-         MASS = as.vector(sum(y[c(2:5,7)])*parms["RATS"]),
-         CP=as.vector(conc[1]*24450.0/parms["MW"])
+       c(DOSE = as.vector(AI0 - y["AI"]),
+         MASS = as.vector(sum(y[c("AAM","AT","AF","AL","AM")])*RATS),
+         CP=as.vector(conc[1]*24450.0/MW)
        ))
-}
+})
 
 ### Versions that only calculate what is needed for parameter estimation
 
@@ -207,12 +210,13 @@ ccl4gnls <- function(time, initconc, lVmax, lKm, lconc) {
     TTime <- sort(unique(time[sel]))
     if (! 0 %in% TTime) TTime <- c(0, TTime)
 
-    out <- lsoda(y, TTime, ccl4modelG, parmmx, rtol=1e-6, atol=1e-6)
+    out <- lsoda(y, TTime, ccl4modelG, parmmx, rtol=1e-12, atol=1e-12)
     CP[sel] <- out[match(time[sel],out[,"time"]),"CP"]
     .grad[sel,"lVmax"] <- out[match(time[sel],out[,"time"]),"dCPdVm"]
     .grad[sel,"lKm"] <- out[match(time[sel],out[,"time"]),"dCPdK"]
     .grad[sel,"lconc"] <- out[match(time[sel],out[,"time"]),"dCPdy0"]
   }
+  
   .grad <- .grad * cbind(Vmax,Km,conc)
   attr(CP,"gradient") <- .grad
   CP
@@ -240,6 +244,7 @@ if (require(nlme, quietly=TRUE)) {
                     data=ccl4data.avg, start=start,
                     weights=varPower(fixed=1),
                     verbose=TRUE)
+
   start <- coef(ccl4.gnls)
   ccl4.gnls2 <- gnls(ChamberConc ~ ccl4gnls(time, factor(initconc),
                                             lVmax, lKm, lconc),
@@ -249,8 +254,10 @@ if (require(nlme, quietly=TRUE)) {
                      weights=varPower(fixed=1),
                      verbose=TRUE)
 
-  print(ccl4.gnls2)
+  print(summary(ccl4.gnls2))
 
+  ### Now fit a separate initial concentration for each animal
+  start <- c(coef(ccl4.gnls))
   cat("\nApprox. 95% Confidence Intervals for Metabolic Parameters:\n")
   tmp <- exp(intervals(ccl4.gnls2)[[1]][1:2,])
   row.names(tmp) <- c("Vmax","Km")

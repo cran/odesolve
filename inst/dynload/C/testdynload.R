@@ -1,4 +1,4 @@
-require(odesolve)
+library(odesolve,lib.loc="~/Rlibtest")
 dyn.load("mymod.so")
 parms <- c(k1 = 0.04, k2 = 1e4, k3=3e7)
 my.atol <- c(1e-6, 1e-10, 1e-6)

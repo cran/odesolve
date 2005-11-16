@@ -29,7 +29,7 @@ lsoda <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
       stop("`func' must be a function or character vector")
     if (is.character(func) && (is.null(dllname) || !is.character(dllname)))
       stop("You need to specify the name of the dll or shared library where func can be found (without extension)")
-    if (!is.numeric(parms)) stop("`parms' must be numeric")
+###    if (!is.numeric(parms)) stop("`parms' must be numeric")
     if (!is.numeric(rtol)) stop("`rtol' must be numeric")
     if (!is.numeric(atol)) stop("`atol' must be numeric")
     if (!is.null(tcrit) & !is.numeric(tcrit)) stop("`tcrit' must be numeric")
