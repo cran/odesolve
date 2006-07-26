@@ -17,7 +17,7 @@
 }
 \usage{
 lsoda(y, times, func, parms, rtol, atol, tcrit=NULL, jacfunc=NULL,
-verbose=FALSE, dllname=NULL, hmin=0, hmax=Inf)
+verbose=FALSE, dllname=NULL, hmin=0, hmax=Inf, ...)
 }
 \arguments{
   \item{y}{the initial values for the ode system.  If \code{y} has a
@@ -87,6 +87,7 @@ verbose=FALSE, dllname=NULL, hmin=0, hmax=Inf)
     stepsize. A maximum value may be necessary for non-autonomous models (with external
     inputs), otherwise the simulation possibly ignores short external
     events.}
+  \item{...}{additional arguments, allowing this to be a generic function}
   }
 \details{
   All the hard work is done by the Fortran subroutine \code{lsoda},

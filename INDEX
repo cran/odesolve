@@ -1,4 +1,9 @@
-ccl4data                 CCl4 metabolism in rats
-ccl4data.avg             CCL4 metabolism in rats - averages
-lsoda                    Solve System of ODE (ordinary differential
-                         equation)s.
+ccl4data                Closed chamber study of CCl4 metabolism by
+                        rats.
+ccl4data.avg            Closed chamber study of CCl4 metabolism by
+                        rats.
+lsoda                   Solve System of ODE (ordinary differential
+                        equation)s.
+rk4                     Solve System of ODE (ordinary differential
+                        equation)s by classical Runge-Kutta 4th order
+                        integration.

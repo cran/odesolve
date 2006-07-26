@@ -1,0 +1,3 @@
+useDynLib(odesolve, .registration = TRUE)
+export(lsoda, rk4)
+

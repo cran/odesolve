@@ -15,7 +15,7 @@
   \code{\link{nlm}} or \code{\link[nlme]{nlme}}.
 }
 \usage{
-  rk4(y, times, func, parms)
+  rk4(y, times, func, parms, ...)
 }
 \arguments{
   \item{y}{the initial values for the ode system.  If \code{y} has a
@@ -39,6 +39,7 @@
   }
   \item{parms}{any parameters used in \code{func} that should be
     modifiable without rewriting the function.}
+  \item{...}{additional arguments, allowing this to be a generic function}
 }
 \seealso{
   \code{\link{lsoda}}

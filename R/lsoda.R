@@ -20,7 +20,8 @@
 ###          the initializer for the problem.
 
 lsoda <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
-	tcrit = NULL, jacfunc=NULL, verbose=FALSE, dllname=NULL, hmin=0, hmax=Inf)
+	tcrit = NULL, jacfunc=NULL, verbose=FALSE, dllname=NULL,
+                  hmin=0, hmax=Inf, ...)
 {
     if (!is.numeric(y)) stop("`y' must be numeric")
     n <- length(y)
