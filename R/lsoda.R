@@ -53,23 +53,17 @@ lsoda <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
     ## change the value of funcname to either symbol.C or symbol.For, depending
     ## on which way we find the symbol
     if (is.character(func)) {
-      
       funcname <- func
-      if (is.loaded(symbol.C(funcname),PACKAGE=dllname)) {
-        funcname <- symbol.C(func)
-      } else if (is.loaded(symbol.For(funcname), PACKAGE=dllname)) {
-        funcname <- symbol.For(funcname)
-      } else stop(paste("Unable to find",funcname,"in",dllname))
       ## get the pointer and put it in func
       func <- getNativeSymbolInfo(funcname,PACKAGE=dllname)$address
 
       ## Now, is there an init function?
 
-      ModelInit <- if (is.loaded(symbol.C(dllname),PACKAGE=dllname)) {
-        getNativeSymbolInfo(symbol.C(dllname), PACKAGE=dllname)$address
-      } else if (is.loaded(symbol.For(dllname),PACKAGE=dllname)) {
-        getNativeSymbolInfo(symbol.For(dllname), PACKAGE=dllname)$address
+      ModelInit <- if (is.loaded(dllname,PACKAGE=dllname, type="") || 
+                       is.loaded(dllname,PACKAGE=dllname, type="Fortran")) {
+        getNativeSymbolInfo(dllname, PACKAGE=dllname)$address
       } else NULL
+
 
       ## Finally, is there a jacobian?
 
@@ -77,11 +71,6 @@ lsoda <- function(y, times, func, parms, rtol=1e-6, atol=1e-6,
         if (!is.character(jacfunc))
           stop("If 'func' is dynloaded, so must 'jacfunc' be")
         jacfuncname <- jacfunc
-        if (is.loaded(symbol.C(jacfuncname),PACKAGE=dllname)) {
-          jacfuncname <- symbol.C(jacfuncname)
-        } else if (is.loaded(symbol.For(jacfuncname),PACKAGE=dllname)) {
-          jacfuncname <- symbol.For(jacfuncname)
-        } else stop(paste("Unable to find",jacfuncname,"in",dllname))
         jacfunc <- getNativeSymbolInfo(jacfuncname,PACKAGE=dllname)$address
       }
 
