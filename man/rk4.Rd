@@ -37,8 +37,8 @@
     \code{\link{names}} attribute) of global values that are required at
     each point in \code{times}.
   }
-  \item{parms}{any parameters used in \code{func} that should be
-    modifiable without rewriting the function.}
+  \item{parms}{vector or list holding the parameters used in \code{func} 
+   that should be modifiable without rewriting the function.}
   \item{...}{additional arguments, allowing this to be a generic function}
 }
 \seealso{
@@ -63,7 +63,7 @@
 	   University Press.
 }
 
-\author{Thomas Petzoldt \email{petzoldt@rcs.urz.tu-dresden.de}}
+\author{Thomas Petzoldt \email{thomas.petzoldt@tu-dresden.de}}
 
 \examples{
 ## A simple resource limited Lotka-Volterra-Model

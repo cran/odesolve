@@ -5,7 +5,7 @@ rk4 <- function(y, times, func, parms, ...) {
     if (!is.numeric(y)) stop("`y' must be numeric")
     if (!is.numeric(times)) stop("`times' must be numeric")
     if (!is.function(func)) stop("`func' must be a function")
-    if (!is.numeric(parms)) stop("`parms' must be numeric")
+    ## if (!is.numeric(parms)) stop("`parms' must be numeric")
 
     n <- length(y)
 
