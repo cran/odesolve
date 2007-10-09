@@ -1,6 +1,6 @@
 \name{ccl4data.avg}
 \alias{ccl4data.avg}
-\non_function{}
+
 \title{Closed chamber study of CCl4 metabolism by rats.}
 \usage{data(ccl4data.avg)}
 \description{

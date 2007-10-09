@@ -1,6 +1,5 @@
 \name{ccl4data}
 \alias{ccl4data}
-\non_function{}
 \title{ Closed chamber study of CCl4 metabolism by rats. }
 \usage{data(ccl4data)}
 \description{
