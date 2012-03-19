@@ -90,7 +90,7 @@ C   930618  Corrected I1MACH(5) for Convex -p8 and -pd8 compiler
 C           options.  (DWL, RWC and WRB).
 C***END PROLOGUE  I1MACH
 C
-      INTEGER IMACH(16),OUTPUT
+      INTEGER IMACH(16),OUTPUT, II(1)
       SAVE IMACH
       EQUIVALENCE (IMACH(4),OUTPUT)
 C
@@ -879,8 +879,10 @@ C
       RETURN
 C
    10 CONTINUE
-      WRITE (UNIT = OUTPUT, FMT = 9000)
- 9000 FORMAT ('1ERROR    1 IN I1MACH - I OUT OF BOUNDS')
+C      WRITE (UNIT = OUTPUT, FMT = 9000)
+C 9000 FORMAT ('1ERROR    1 IN I1MACH - I OUT OF BOUNDS')
+      II(1) = I
+      call intpr('ERROR 1 IN I1MACH - I OUT OF BOUNDS.  I =',-1,II,1)
 C
 C     CALL FDUMP
 C

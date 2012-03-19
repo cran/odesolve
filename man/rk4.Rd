@@ -11,7 +11,7 @@
   A vector of parameters is passed to the ODEs, so the solver may
   be used as part of a modeling package for ODEs, or for parameter
   estimation using any appropriate modeling tool for non-linear models
-  in \R such as \code{\link{optim}}, \code{\link[nls]{nls}},
+  in \R such as \code{\link{optim}}, 
   \code{\link{nlm}} or \code{\link[nlme]{nlme}}.
 }
 \usage{

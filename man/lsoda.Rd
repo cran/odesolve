@@ -12,8 +12,7 @@
   parameters is passed to the ODEs, so the solver may be used as part of
   a modeling package for ODEs, or for parameter estimation using any
   appropriate modeling tool for non-linear models in \R such as
-  \code{\link{optim}}, \code{\link[nls]{nls}}, \code{\link{nlm}} or
-  \code{\link[nlme]{nlme}}.
+  \code{\link{optim}}, \code{\link{nlm}} or \code{\link[nlme]{nlme}}.
 }
 \usage{
 lsoda(y, times, func, parms, rtol, atol, tcrit=NULL, jacfunc=NULL,
